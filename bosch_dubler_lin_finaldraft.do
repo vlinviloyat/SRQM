@@ -12,16 +12,16 @@ set more off
 
  GROUP:  T. Bosch, N. Dubler, V. Lin, 
 
- TOPIC:  Country-Level Determinants of Ratio of Women in the Workforce
+ TOPIC:  Country-Level Determinants of Share of Women in the Workforce
 
  DATA:   Quality of Government (2016)
 
  DATE:   19 March 2020
 
  SUMMMARY
-   We study variations in the ratio of women in the workplace relative to men, 
+   We study variations in the share of women in the total workforce among countries, 
    in order to show how differences observed between a country's level of 
-   education, economic growth, conservatism, and even employment in certain 
+   education, economic growth, religion, and even employment in certain 
    sectors might influence workforce representation inequalities.
  
  QUESTIONS
@@ -44,11 +44,11 @@ set more off
  in the workforce.
  
  
- - (H4): The higher the rates of Catholicism or Islam belief in a country, 
+ - (H4): The higher the rates of Catholic or Muslim population in a country, 
  the lower the share of women in the workforce.
  
  
- - (H5): The higher the share of employment in agriculture relative to a countryís
+ - (H5): The higher the share of employment in agriculture relative to a country's
  total employment, the higher the share of women in the workforce.
  
  
@@ -70,6 +70,7 @@ wdi_conprev
 
 
 * I) Dependent variable:  Women in labor force, ratio to men
+* -----------------------------------------------------------
 
 * MEASURES -- Ratio of women to men in a given country's labor force
 * CODEBOOK -- QOG 2016, page 841
@@ -134,8 +135,8 @@ gr hbox workforce, ///
 	name(workforce_boxplot, replace)
 	
 
-*II) Independent variables
-* ---------------------
+* II) Independent variables
+* ------------------------
 
 fre gle_cgdpc une_tfr bl_asys15f lp_catho80 lp_muslim80 wdi_empagr
 
@@ -218,7 +219,7 @@ ren lp_catho80 catholic
 * Decription of the IV. 
 su catholic, d
 
-* For the share of catholics among the population, the dataset delivers 150 valid
+* For the share of Catholics among the population, the dataset delivers 150 valid
 * country cases. This means that approximately 20% of the countries do not have data
 * on this measure, which will further decrease the number of vountries for which whe have
 * overall overlapping data.
@@ -246,7 +247,7 @@ su muslim, d
 hist muslim, freq normal ///
   name(muslim, replace)
   
-* Both the histogramm for the "catholic" variable and the "muslim" variable are
+* Both the histogramm for the "Catholic" variable and the "Muslim" variable are
 * very left-skewed - something that we address later in this do-file.
   
   
@@ -328,9 +329,6 @@ li country if !mi(workforce, GDPcapita, fertility, education, catholic, muslim, 
 * As the above commands demonstrate, dropping the "contraceptive" variable
 * from our sample increases the number of valid observations
 * from 42 to 91.
-
-
-* END of dealing with missing values.
 
 
 * RE-CODING OF VARIABLES
@@ -432,13 +430,13 @@ tab ht_region
 * Let's now compare that distribution with our 'no missing data' country sample.
 tab ht_region if !mi(workforce, fertility, GDPcapita, muslim, education, catholic, agriculture)
 
-* The results show that our Religion and Agriculture IVs are going to force us 
+* The results show that our "religious" and "agriculture" IVs are going to force us 
 * to ignore a fraction of the entire dataset, because it is missing for 18
 * countries. This will limit the representativeness of our study. Let's find
 * out how exactly.
 
 * Subsetting
-*-------------------------------
+* ------------------------------
 
 * Now, we finalize our dataset by deleting observations with missing data in our 
 * of variables. The final count represents the actual sample siza that we will
@@ -447,6 +445,8 @@ drop if mi(workforce, fertility, GDPcapita, muslim, education, catholic, agricul
 
 * Final count:
 count
+
+* END of dealing with missing values.
 
 
 * IV) VARIABLE TRANSFORMATION
@@ -580,14 +580,14 @@ gr hbox workforce, over(catholic4) l1title("Catholics in total population") ///
 spineplot workforce4 catholic4, scheme(burd6) ///
      name(catholic4_spine, replace)
 
-* Our religious belief variables also yield interesting results. The boxplot illustrating the association
-* between the share of muslims in the population and the share of women in the workforce suggests that there
-* is a negative relationship between the share of the muslim population in a given country and the share of 
-* women in that countries workforce. Just like we hypothesised, a larger share of muslims in the population
+* Our "religious" variables also yield interesting results. The boxplot illustrating the association
+* between the share of Muslims in the population and the share of women in the workforce suggests that there
+* is a negative relationship between the share of the Muslim population in a given country and the share of 
+* women in that countries workforce. Just like we hypothesised, a larger share of Muslims in the population
 * is associated with fewer women in the labor market.
-* A similar tendency can be observed for the catholic believe variable. However, we the results are less clear:
-* A low proportion of catholic believers is not necessarily associated with fewer women in the labor market.
-* Instead, countries with a low share of catholic population are associated with female labor force
+* A similar tendency can be observed for the Catholic population variable. However, we the results are less clear:
+* A low proportion of Catholics is not necessarily associated with fewer women in the labor market.
+* Instead, countries with a low share of Catholic population are associated with female labor force
 * representation that varies along the entire range of the distribution.
 
 gr hbox workforce, over(agriculture4) l1title("Share of Employees in Agriculture") ///
@@ -656,9 +656,9 @@ stab using bosch_dubler_lin_firstdraft_stats.txt, replace ///
 * given IV and our DV, and then by running simple linear regressions for each IV 
 * on the DV.
 
-* In our earlier visual analysis of variables far, we put the values 
+* In our earlier visual analysis of variables so far, we put the values 
 * for independent variables into groups, so the IVs effectively became ordinal, 
-* not continuous(lines 335-411 of this do-file). We did this temporarily for 
+* not continuous. We did this temporarily for 
 * illustration purposes in the descriptive statistics part, because a graphical 
 * illustration with grouped values was convenient. However, for the following 
 * inferential statistics part, we will go back to working with the original, 
@@ -878,9 +878,11 @@ gen education_square = education^2
 la var education_square "Average secondary schooling years (square)"
 
 * Visual inspection.
-tw (sc workforce education_square, $ccode) (lfit workforce education_square, $ci), ///
-    name(fert_edu_square_lfit, replace)
 
+tw (sc workforce education_square, $ccode) (lfit workforce education_square, $ci), ///
+   yti("Share of women in the workforce") ///
+    name(fert_edu_square_lfit, replace)
+	
 reg workforce education_square 
 
 rvfplot, yline(0) ///
@@ -908,10 +910,10 @@ tw (sc workforce education_square, $ccode) (qfit workforce education_square, $ci
 * regression, which we undertake below.
 
 
- *IV (4): workforce and share of muslim population
- *------------------------------------------------
+* IV (4): workforce and share of muslim population
+* -------------------------------------------------
  
-* Examine the correlation between the women workforce and the respective countrie's share of muslim population:
+* Examine the correlation between the women workforce and the respective countrie's share of Muslim population:
 tw (sc workforce muslim, $ccode) (lfit workforce muslim, $ci), ///
 	yti("Share of women in the workforce") ///
     name(workf_muslim1, replace)
@@ -921,19 +923,19 @@ tw (sc workforce muslim, $ccode) (lfitci workforce muslim, $ci), ///
 	yti("Share of women in the workforce") ///
     name(workf_muslim2, replace)
 
-* Estimate the predicted effect of the share of a country's muslim population on the share of women
+* Estimate the predicted effect of the share of a country's Muslim population on the share of women
 * in the workforce.
 reg workforce muslim
 
-* The scatterplot illustrates a negative relationship between the share of muslims in the
+* The scatterplot illustrates a negative relationship between the share of Muslims in the
 * population and the share of women in the workforce, as we hypothesised at the beginning
-* of our paper. The linear regression of the "muslim" variable on the "workforce" variable
-* shows a slight, but marked negative trend with a coefficient of -0.0016518. This linear model
-* can thus be interpreted as follows: An increase of the muslim population by, say, 20%, would be 
+* of our paper. The linear regression of the "Muslim" variable on the "workforce" variable
+* shows a slight, but marked negative trend with a coefficient of -0.0016518. This linear model 
+*can thus be interpreted as follows: An increase of the Muslim population by, say, 10%, would be 
 * predicted to be associated with a decrease of the share of women in the workforce of
-* approximately 3% (20 * 0.0016518 = 0.033036). The negative relationship may be slight, but it 
+* approximately 0.02% (0.1 * 0.0016518 = 0.00016518). The negative relationship may be slight, but it 
 * is highly significant (p-value 0.000). The r-squared value is 0.5139, so 51% of the variation in
-* the share of women in the workforce is explained by the variance in the share of muslim population.
+* the share of women in the workforce is explained by the variance in the share of Muslim population.
 
  
 * Plotting regression results
@@ -955,24 +957,24 @@ predict r, resid
 sc workforce muslim || conn yhat muslim, ///
     name(dv_yhat6, replace)
 
- * The above residuals-versus-fitted plot reveals that the linear regression model seems
- * to fit our data rather well in this case: The residuals appear to be approximately 
- * normally distributed, with the vast majority of country cases grouped closely along 
- * the fitted linear line, and some other country cases rather far away from the linear
- * fitted line, either above or below the linear fit. There appears to be little variance
- * in the residuals-versus-fitted plot, although the variance seems to be a little 
- * larger among the left-hand side of the graph (i.e. among the countries with a high
- * share of muslim population. Finally, a clear remaining trend is not immediately 
- * recognizable from the residuals-versus-fitted plot. Still, in the following command,
- * we allow the fitted line to relax its linearity assumption and thake on a non-linear
- * fitted value.
+* The above residuals-versus-fitted plot reveals that the linear regression model seems
+* to fit our data rather well in this case: The residuals appear to be approximately 
+* normally distributed, with the vast majority of country cases grouped closely along 
+* the fitted linear line, and some other country cases rather far away from the linear
+* fitted line, either above or below the linear fit. There appears to be little variance
+* in the residuals-versus-fitted plot, although the variance seems to be a little 
+* larger among the left-hand side of the graph (i.e. among the countries with a high
+* share of Muslim population. Finally, a clear remaining trend is not immediately 
+* recognizable from the residuals-versus-fitted plot. Still, in the following command,
+* we allow the fitted line to relax its linearity assumption and thake on a non-linear
+* fitted value.
  
 tw (sc workforce muslim, $ccode) (qfit workforce muslim, $ci), ///
 	yti("Share of women in the workforce") ///
     name(workf_muslim_qfit, replace)
  
  * Based on our ovbservations, we check whether a logarithmic transformation of the IV 
- * may better fit our linear model. In what follows, we thus generate the "muslim" 
+ * may better fit our linear model. In what follows, we thus generate the "Muslim" 
  * variable in its logged form, plot it against the DV and run a regression for it.
  
 * Variable transformation.
@@ -988,12 +990,15 @@ reg workforce muslim_log
 * Simple residuals-versus-fitted plot.
 rvfplot, yline(0) ///
     name(rvfplot7, replace)
+	
 * Get fitted values.
 cap drop yhat
 predict yhat
+
 * Get residuals.
 cap drop r
 predict r, resid
+
 * Plot DV with observed and predicted values of IV.
 sc workforce muslim_log || conn yhat muslim_log, ///
     name(dv_yhat7, replace)
@@ -1010,11 +1015,11 @@ tw (sc workforce muslim_log, $ccode) (qfit workforce muslim_log, $ci), ///
 * transformation.
  
 
- *IV (5): workforce and share of catholic population
- *------------------------------------------------
+* IV (5): workforce and share of Catholic population
+* ------------------------------------------------
  
- * We repeat the correlation analysis for the other religion IV, namely the share of
- * the population in a given country that is catholic.
+* We repeat the correlation analysis for the other religion IV, namely the share of
+* the population in a given country that is Catholic.
  tw (sc workforce catholic, $ccode) (lfit workforce catholic, $ci), ///
 	yti("Share of women in the workforce") ///
     name(workf_catholic1, replace)
@@ -1028,10 +1033,10 @@ reg workforce catholic
 
 * Running the regression, we first observe what already became apparent from the
 * scatterplot: in a linear model, on average, there is almost no meaningful trend 
-* in the relationship betweeen the share of the population that is catholic 
+* in the relationship betweeen the share of the population that is Catholic 
 * and the share of women in the workforce. If anything, the relationship is slightly
 * positive(coefficient: 0.0002486). We note that this is contrary to our hypothesis, 
-* which assumed that the share of women working would decrease as the share of catholics
+* which assumed that the share of women working would decrease as the share of Catholics
 * increases. However, the relationship is not statistically significant, and so at least
 * in a simple linear regression, we cannot assume catholic belief to have a non-random
 * influence on the share of women in the workforce.  
@@ -1092,12 +1097,15 @@ reg workforce catholic_log
 * Simple residuals-versus-fitted plot.
 rvfplot, yline(0) ///
     name(rvfplot9, replace)
+	
 * Get fitted values.
 cap drop yhat
 predict yhat
+
 * Get residuals.
 cap drop r
 predict r, resid
+
 * Plot DV with observed and predicted values of IV.
 sc workforce catholic_log || conn yhat catholic_log, ///
     name(dv_yhat9, replace) 
@@ -1110,11 +1118,11 @@ sc workforce catholic_log || conn yhat catholic_log, ///
 * "catholic_log" for the multilinear regression model.
 
 
- *IV (6): workforce and the importance of agriculture
- *---------------------------------------------------
+* IV (6): workforce and the importance of agriculture
+* ---------------------------------------------------
 
- * We finally analyze the correlation betweent the share of women in the workforce and the
- * proportion of the workforce employed in the agricultural sector:
+* We finally analyze the correlation betweent the share of women in the workforce and the
+* proportion of the workforce employed in the agricultural sector:
  tw (sc workforce agriculture, $ccode) (lfit workforce agriculture, $ci), ///
 	yti("Share of women in the workforce") ///
     name(workf_agriculture1, replace)
@@ -1246,12 +1254,12 @@ reg workforce GDPcapita fertility education_square catholic_log muslim agricultu
 * Interestingly, this trend is in contradiction to our initial hypothesis, as we had assumed 
 * fertility rate to be negatively correlated with the share of women in the workforce.
 
-* Third we find a negative and statistically significant relationship between the share of muslims
+* Third we find a negative and statistically significant relationship between the share of Muslims
 * in the population and the share of women in the workforce (coefficient -0.0019; p-value 0.000).
-* Thus, a 10% increase in the share of muslims across the population would be estimated to be 
+* Thus, a 10% increase in the share of Muslims across the population would be estimated to be 
 * associated with a 0.01 % decrease in the share of women in the population. This relationship is 
 * extremely weak, but in conformity with our initial hypothesis.
-* Similarly, the share of catholics among the population is weakly negatively correlated with the 
+* Similarly, the share of Catholics among the population is weakly negatively correlated with the 
 * share of women in the workforce. However, in contrast to the "muslim" variable, this relationship
 * is not statistically significant.
 
@@ -1265,7 +1273,7 @@ reg workforce GDPcapita fertility education_square catholic_log muslim agricultu
 * remains statistically insignificant.
 
 * Overall, we thus find only moderate preliminary support for our initial hypotheses, as only 
-* GDP per capita and the share of the muslim population are correlated in a statistically
+* GDP per capita and the share of the Muslim population are correlated in a statistically
 * significant way with the share of women in the population, in line with our assumptions.
 * However, these results are only preliminary, and we will have to wait until the inclusion of
 * interaction terms to draw final conclusions. This is part of the regression diagnostics, which
@@ -1341,6 +1349,7 @@ tw sc rst yhat if !inlist(region, 3, 6) || ///
 sc rst yhat, yline(-2 2) || sc rst yhat if abs(rst) > 2, ///
     ylab(-3(1)3) mlab(ccodealp) legend(lab(2 "Outliers")) ///
     name(diag_rst, replace)
+	
 * Among our dataset with 91 countries, we find five particular outliers: India, Sri Lanka,
 * Senegal, the Gambia and Bangladesh.
 
@@ -1396,19 +1405,19 @@ c.muslim#c.agriculture
 * significantly. We find that our initial relationships are retained, but only the "religious variables" appear
 * statistically significant: 
 
-* A higher share of muslim population is associated with a lower share of women represented in the
+* A higher share of Muslim population is associated with a lower share of women represented in the
 * workforce, but this relationship is extremely weak (correlation coefficient -0.0024). 
-* This means that a 10% increase in the share of muslim population is associated with a 0.02%
+* This means that a 10% increase in the share of Muslim population is associated with a 0.02%
 * decrease of women in the workforce. The relationship is extremely weak, but statistically significant
 * (p-value 0.000). 
 
-* Similarly, the share of the catholic population is associated with a lower share of women
+* Similarly, the share of the Catholic population is associated with a lower share of women
 * represented in the workforce. Since the catholic variable is in its logarithmic form, the
 * interpretation is of the form 
 * --> Y = alpha + beta ln X.
 * --> Share of women in the workforce = alpha + (-0.0051) ln catholic.
-* This means that a 1% increase in the catholic population is associated with
-* a 0.01*beta unit increase in Y. Thus, here, a 1% increase in the catholic population is associated
+* This means that a 1% increase in the Catholic population is associated with
+* a 0.01*beta unit increase in Y. Thus, here, a 1% increase in the Catholic population is associated
 * with a  0.0051% in the share of women in the workforce. The relationship is significant, with a p-value
 * of 0.04.
 
@@ -1421,7 +1430,7 @@ c.muslim#c.agriculture
 * -----------------------------------------
 * As both our DV and our IVs are continuous, we used correlations and regressions to illustrate
 * the relationship between our IVs and our DV.
-* However, just to apply what we have learned during the course, we will now recode two variables in categories
+* However, just to apply what we have learned during the course, we will use our categorical version of two IVs
 * and run a chi-squared test. 
 
 tab workforce4 fertility6, chi2     
